@@ -10,11 +10,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(GGML_USE_ACCELERATE 1)
 find_package(pybind11 REQUIRED)
 
-add_library(llamacpp MODULE src/PyLlama.cpp ../llama.cpp ../ggml.c ../utils.cpp)
+add_subdirectory(vendor/llama.cpp)
+add_library(llamacpp MODULE src/PyLlama.cpp)
 
-target_include_directories(llamacpp PRIVATE ../)
-
-target_link_libraries(llamacpp PRIVATE pybind11::module pybind11::lto pybind11::windows_extras)
+target_include_directories(llamacpp PRIVATE vendor/llama.cpp)
+target_link_libraries(llamacpp PRIVATE pybind11::module pybind11::lto pybind11::windows_extras llamalib)
 add_link_options(-no_fixup_chains)
 pybind11_extension(llamacpp)
 

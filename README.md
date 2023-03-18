@@ -1,21 +1,18 @@
+## Python bindings for llama.cpp
+
 ## Building the Python bindings
 
 ### macOS
 
-`brew install pybind11`
-
-## Install python package
-
+```
+brew install pybind11  # Installs dependency
+git submodule init && git submodule update
+poetry install
+```
 ### From PyPI
 
 ```
 pip install llamacpp
-```
-
-### From source
-
-```
-poetry install
 ```
 
 ## Get the model weights
@@ -32,25 +29,16 @@ Convert the weights to GGML format using `llamacpp-convert`. Then use `llamacpp-
 ```
 llamacpp-convert ./models/7B/ 1
 llamacpp-quantize ./models/7B/
+llamacpp-cli
 ```
 
-## Run this demo script
+## Command line interface
 
-```
-import llamacpp
-import os
+The package installs the command line entry point `llamacpp-cli` that points to `llamacpp/cli.py` and should provide about the same functionality as the `main` program in the original C++ repository. There is also an experimental `llamacpp-chat` that is supposed to bring up a chat interface but this is not working correctly yet.
 
-model_path = "./models/7B/ggml-model-q4_0.bin"
-params = llamacpp.gpt_params(model_path,
-"Hi, I'm a llama.",
-4096,
-40,
-0.1,
-0.7,
-2.0)
-model = llamacpp.PyLLAMA(model_path, params)
-model.predict("Hello, I'm a llama.", 10)
-```
+## Demo script
+
+See `llamacpp/cli.py` for a detailed example. The simplest demo would be something like the following:
 
 ## ToDo
 
