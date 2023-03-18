@@ -1,6 +1,6 @@
 name: Build
 
-on: [workflow_dispatch]
+on: [workflow_dispatch, release]
 
 jobs:
   build_wheels:
@@ -33,7 +33,37 @@ jobs:
         with:
           path: ./wheelhouse/*.whl
 
-      # - name: Publish a Python distribution to PyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
-      #   with:
-      #     password: ${{ secrets.PYPI_API_TOKEN }}
+  make_sdist:
+    name: Make SDist
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Optional, use if you use setuptools_scm
+        submodules: true  # Optional, use if you have submodules
+
+    - name: Install setup dependencies
+      run: python -m pip install poetry
+
+    - name: Build SDist
+      run: poetry build -f sdist
+
+    - uses: actions/upload-artifact@v3
+      with:
+        path: dist/*.tar.gz
+
+  upload_all:
+    needs: [build_wheels, make_sdist]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+    - uses: actions/download-artifact@v3
+      with:
+        name: artifact
+        path: dist
+
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@v1.5.0
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
