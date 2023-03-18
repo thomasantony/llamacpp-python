@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "llamacpp"
+version = "0.1.5"
+description = "Python bindings for @ggerganov's llama.cpp"
+authors = ["Thomas Antony <mail@thomasantony.com>"]
+license = "MIT"
+readme = "python/README.md"
+packages = [{ include = "llamacpp", from = "python" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+torch = "^1.13.1"
+sentencepiece = "^0.1.97"
+
+[tool.poetry.group.dev.dependencies]
+setuptools-cpp = "^0.1.0"
+setuptools = "^67.6.0"
+wheel = "^0.38.4"
+
+[build-system]
+requires = ["poetry>=0.12", "setuptools", "wheel", "setuptools-cpp"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.build]
+script = "build.py"
+generate-setup-file = true
+
+[tool.poetry.scripts]
+llamacpp-convert = 'llamacpp.convert:main'
+llamacpp-quantize = 'llamacpp.quantize:main'
+llamacpp-cli = 'llamacpp.cli:run'
+llamacpp-chat = 'llamacpp.chat:run'
