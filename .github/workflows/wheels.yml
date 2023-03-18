@@ -1,19 +1,38 @@
 name: Build
 
-on: [workflow_dispatch, release]
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+      - main
+  push:
+    branches:
+      - master
+      - main
+  release:
+    types:
+      - published
 
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
+    name: ${{ matrix.type }} ${{ matrix.arch }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macOS-11]
+        os: [macos-latest, ubuntu-latest]
+        arch: [auto64]
+        include:
+          - os: macos-latest
+            arch: universal2
 
     steps:
       - uses: actions/checkout@v3
         with:
-          submodules: recursive
+          fetch-depth: 0
+          submodules: true
+
       # Used to host cibuildwheel
       - uses: actions/setup-python@v3
       # Installs poetry
@@ -25,9 +44,9 @@ jobs:
 
       - name: Build wheels
         run: python -m cibuildwheel --output-dir wheelhouse
-        # to supply options, put them in 'env', like:
-        # env:
-        #   CIBW_SOME_OPTION: value
+        env:
+          CIBW_ARCHS_MACOS: "x86_64 universal2 arm64"
+          CIBW_TEST_SKIP: '*_arm64 *_universal2:arm64'
 
       - uses: actions/upload-artifact@v3
         with:
