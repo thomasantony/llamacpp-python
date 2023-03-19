@@ -15,7 +15,7 @@ add_subdirectory(vendor/llama.cpp)
 add_library(llamacpp MODULE src/PyLlama.cpp)
 
 target_include_directories(llamacpp PRIVATE vendor/llama.cpp)
-target_link_libraries(llamacpp PRIVATE pybind11::module pybind11::lto pybind11::windows_extras llamalib)
+target_link_libraries(llamacpp PRIVATE pybind11::module pybind11::lto pybind11::windows_extras llama)
 add_link_options(-no_fixup_chains)
 pybind11_extension(llamacpp)
 
@@ -26,3 +26,5 @@ endif()
 
 set_target_properties(llamacpp PROPERTIES CXX_VISIBILITY_PRESET "hidden"
     CUDA_VISIBILITY_PRESET "hidden")
+
+install(TARGETS llamacpp LIBRARY DESTINATION llamacpp)

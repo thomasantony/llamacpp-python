@@ -1,43 +1,47 @@
-[tool.poetry]
+[build-system]
+requires = ["scikit-build-core>=0.2.1", "pybind11"]
+build-backend = "scikit_build_core.build"
+
+[project]
 name = "llamacpp"
 version = "0.1.7"
 description = "Python bindings for @ggerganov's llama.cpp"
-authors = ["Thomas Antony <mail@thomasantony.com>"]
-license = "MIT"
+authors = [
+    {name = "Thomas Antony", email= "mail@thomasantony.com"}
+]
+license = {text = "MIT"}
 readme = "README.md"
+requires-python = ">=3.7"
+
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+]
+
+[project.urls]
 homepage = "https://github.com/thomasantony/llamacpp-python"
 repository = "https://github.com/thomasantony/llamacpp-python"
-packages = [{ include = "llamacpp", from = "." }]
 
-[tool.poetry.dependencies]
-python = "^3.7"
+[tool.scikit-build]
+wheel.expand-macos-universal-tags = true
 
-[tool.poetry.group.dev.dependencies]
-# Require torch and sentencepiece for running the convert script
-torch = "^1.13.1"
-sentencepiece = "^0.1.97"
-setuptools-cpp = "^0.1.0"
-
-[build-system]
-requires = ["poetry>=0.12", "setuptools", "wheel", "setuptools-cpp"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.build]
-script = "build.py"
-generate-setup-file = true
-
-[tool.poetry.scripts]
+[project.scripts]
 llamacpp-convert = 'llamacpp.convert:main'
 llamacpp-quantize = 'llamacpp.quantize:main'
 llamacpp-cli = 'llamacpp.cli:run'
 llamacpp-chat = 'llamacpp.chat:run'
 
 [tool.cibuildwheel]
-# Install pybind and poetry
-before-build = "pip install -U \"pybind11[global]\" poetry"
+test-command = "python -c \"import llamacpp\""
 
-# Skip PyPy and 32-bit builds
-skip = ["pp*", "*-win32", "*-manylinux_i686", "*-musllinux_i686"]
+# Skip Python 3.6, PyPy and 32-bit builds
+skip = ["cp36-*", "pp*", "*-win32", "*-manylinux_i686", "*-musllinux_i686"]
 
 build-verbosity = 3
-test-skip = "*macosx*arm64*"
+test-skip = ["*universal2:arm64"]
