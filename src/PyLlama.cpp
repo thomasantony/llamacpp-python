@@ -74,6 +74,9 @@ public:
             return llama_is_anti_prompt_present(*ctx_ptr, antiprompt_inp);
         }
     }
+    void reset_remaining_tokens() {
+        llama_reset_remaining_tokens(*ctx_ptr);
+    }
     void print_startup_stats() {
         llama_print_startup_stats(*ctx_ptr);
     }
@@ -85,8 +88,6 @@ public:
 // Write python bindings for gpt_params
 gpt_params init_params(
     const std::string& model,
-    const std::string& prompt,
-    const std::string& antiprompt,
     int32_t n_ctx,
     int32_t n_predict,
     int32_t top_k,
@@ -96,15 +97,10 @@ gpt_params init_params(
     int32_t seed,
     int32_t n_threads,
     int32_t repeat_last_n,
-    int32_t n_batch,
-    bool use_color,
-    bool interactive,
-    bool interactive_start
+    int32_t n_batch
 ) {
     gpt_params params{};
     params.model = model;
-    params.prompt = prompt;
-    params.antiprompt = antiprompt;
     params.n_predict = n_predict;
     params.n_ctx = n_ctx;
     params.top_k = top_k;
@@ -115,9 +111,6 @@ gpt_params init_params(
     params.n_threads = n_threads;
     params.repeat_last_n = repeat_last_n;
     params.n_batch = n_batch;
-    params.use_color = use_color;
-    params.interactive = interactive;
-    params.interactive_start = interactive_start;
     return params;
 }
 
@@ -127,8 +120,6 @@ PYBIND11_MODULE(llamacpp, m) {
     py::class_<gpt_params>(m, "gpt_params")
         .def(py::init<>(&init_params), "Initialize gpt_params",
              py::arg("model"),
-             py::arg("prompt"),
-             py::arg("antiprompt"),
              py::arg("n_ctx"),
              py::arg("n_predict"),
              py::arg("top_k"),
@@ -138,13 +129,8 @@ PYBIND11_MODULE(llamacpp, m) {
              py::arg("seed"),
              py::arg("n_threads"),
              py::arg("repeat_last_n"),
-             py::arg("n_batch"),
-             py::arg("use_color"),
-             py::arg("interactive"),
-             py::arg("interactive_start"))
+             py::arg("n_batch"))
         .def_readwrite("model", &gpt_params::model)
-        .def_readwrite("prompt", &gpt_params::prompt)
-        .def_readwrite("antiprompt", &gpt_params::antiprompt)
         .def_readwrite("n_predict", &gpt_params::n_predict)
         .def_readwrite("n_ctx", &gpt_params::n_ctx)
         .def_readwrite("top_k", &gpt_params::top_k)
@@ -154,10 +140,7 @@ PYBIND11_MODULE(llamacpp, m) {
         .def_readwrite("seed", &gpt_params::seed)
         .def_readwrite("n_threads", &gpt_params::n_threads)
         .def_readwrite("repeat_last_n", &gpt_params::repeat_last_n)
-        .def_readwrite("n_batch", &gpt_params::n_batch)
-        .def_readwrite("use_color", &gpt_params::use_color)
-        .def_readwrite("interactive", &gpt_params::interactive)
-        .def_readwrite("interactive_start", &gpt_params::interactive_start);
+        .def_readwrite("n_batch", &gpt_params::n_batch);
 
     py::class_<PyLLAMA>(m, "PyLLAMA")
         .def(py::init<gpt_params>())
@@ -194,6 +177,7 @@ PYBIND11_MODULE(llamacpp, m) {
         .def("is_antiprompt_present", &PyLLAMA::is_antiprompt_present, "Check if antiprompt is present")
         .def("print_startup_stats", &PyLLAMA::print_startup_stats, "Print startup stats")
         .def("print_end_stats", &PyLLAMA::print_end_stats, "Print end stats")
+        .def("reset_remaining_tokens", &PyLLAMA::reset_remaining_tokens, "Reset remaining tokens")
         .def_property("antiprompt", &PyLLAMA::get_antiprompt, &PyLLAMA::set_antiprompt, "Antiprompt")
         ;
 
