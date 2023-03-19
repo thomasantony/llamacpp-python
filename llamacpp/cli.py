@@ -100,8 +100,7 @@ def parse_args_into_params(argv) -> llamacpp.gpt_params:
         args.repeat_last_n,
         args.batch_size,
         args.color,
-        args.interactive or args.interactive_start,
-        args.interactive_start,
+        args.interactive,
     )
 
     return params
@@ -140,10 +139,6 @@ def main(params):
         print(" - Press Return to return control to LLaMa.")
         print(" - If you want to submit another line, end your input in '\\'.")
         print()
-
-    # prompt user immediately after the starting prompt has been loaded
-    if params.interactive_start:
-        is_interacting = True
 
     input_noecho = False
     is_finished = False

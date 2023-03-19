@@ -59,8 +59,7 @@ params = llamacpp.gpt_params(
 	64, # repeat_last_n
 	8, # batch_size
 	False, # color
-	False, # interactive or args.interactive_start
-	False, # interactive_start
+	False, # interactive
 )
 model = llamacpp.PyLLAMA(params)
 model.add_bos()		# Adds "beginning of string" token

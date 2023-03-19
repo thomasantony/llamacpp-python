@@ -111,8 +111,7 @@ def parse_chat_params(argv) -> llamacpp.gpt_params:
         args.repeat_last_n,
         args.batch_size,
         args.color,
-        args.interactive or args.interactive_start,
-        args.interactive_start,
+        args.interactive
     )
 
     return params
