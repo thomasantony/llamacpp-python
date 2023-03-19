@@ -9,9 +9,9 @@ def parse_args_into_params(argv) -> llamacpp.gpt_params:
     parser = argparse.ArgumentParser(description="llama.cpp CLI")
     parser.add_argument("-i", "--interactive", action="store_true", help="run in interactive mode")
     parser.add_argument(
-        "--interactive-start",
+        "-ins", "--instruct",
         action="store_true",
-        help="run in interactive mode and poll user input at startup",
+        help="run in 'instruct mode' where the user is prompted to enter a command",
         default=False,
     )
     parser.add_argument(
@@ -39,11 +39,10 @@ def parse_args_into_params(argv) -> llamacpp.gpt_params:
         "--prompt",
         type=str,
         help="prompt to start generation with (default: random)",
-        required=True,
     )
-    # parser.add_argument(
-    #     "-f", "--file", type=str, default="", help="prompt file to start generation."
-    # )
+    parser.add_argument(
+        "-f", "--file", type=str, default="", help="prompt file to start generation."
+    )
     parser.add_argument(
         "-n", "--n_predict", type=int, default=128, help="number of tokens to predict (default: 128)"
     )
@@ -81,29 +80,7 @@ def parse_args_into_params(argv) -> llamacpp.gpt_params:
 
     args = parser.parse_args(argv[1:])
 
-    # Add a space in front of the first character to match OG llama tokenizer behavior
-    args.prompt = " " + args.prompt
-
-    # Initialize gpt_params object
-    params = llamacpp.gpt_params(
-        args.model,
-        args.prompt,
-        args.reverse_prompt,
-        args.ctx_size,
-        args.n_predict,
-        args.top_k,
-        args.top_p,
-        args.temp,
-        args.repeat_penalty,
-        args.seed,
-        args.threads,
-        args.repeat_last_n,
-        args.batch_size,
-        args.color,
-        args.interactive,
-    )
-
-    return params
+    return args
 
 
 def process_interactive_input(model: llamacpp.PyLLAMA):
@@ -121,24 +98,57 @@ def process_interactive_input(model: llamacpp.PyLLAMA):
             break
 
 
-def main(params):
+def main(args):
     """Main function"""
+
+    # if args.file is specified, read the file and set the prompt to the contents
+    if args.file:
+        with open(args.file, "r") as f:
+            args.prompt = f.read().strip()
+
+    # Add a space in front of the first character to match OG llama tokenizer behavior
+    args.prompt = " " + args.prompt
+
+    # Initialize the gpt_params object
+    params = llamacpp.gpt_params(
+        args.model,
+        args.ctx_size,
+        args.n_predict,
+        args.top_k,
+        args.top_p,
+        args.temp,
+        args.repeat_penalty,
+        args.seed,
+        args.threads,
+        args.repeat_last_n,
+        args.batch_size,
+    )
+
     model = llamacpp.PyLLAMA(params)
     model.add_bos()
-    model.update_input(params.prompt)
+    model.update_input(args.prompt)
     model.print_startup_stats()
     model.prepare_context()
 
-    # Set antiprompt if we are in interactive mode
-    if params.interactive:
-        model.set_antiprompt(params.antiprompt)
+    inp_pfx = model.tokenize("\n\n### Instruction:\n\n", True)
+    inp_sfx = model.tokenize("\n\n### Response:\n\n", False)
 
-    if params.interactive:
+    if args.instruct:
+        args.interactive = True
+        args.antiprompt = "### Instruction:\n\n"
+
+    # Set antiprompt if we are in interactive mode
+    if args.antiprompt:
+        args.interactive = True
+        model.set_antiprompt(args.antiprompt)
+
+    if args.interactive:
         print("== Running in interactive mode. ==")
         print(" - Press Ctrl+C to interject at any time.")
         print(" - Press Return to return control to LLaMa.")
         print(" - If you want to submit another line, end your input in '\\'.")
         print()
+        is_interacting = True
 
     input_noecho = False
     is_finished = False
@@ -147,7 +157,7 @@ def main(params):
         if model.has_unconsumed_input():
             model.ingest_all_pending_input(not input_noecho)
             # # reset color to default if we there is no pending user input
-            # if (!input_noecho && params.use_color) {
+            # if (!input_noecho && args.use_color) {
             #     printf(ANSI_COLOR_RESET);
             # }
         else:
@@ -155,25 +165,42 @@ def main(params):
             print(text, end="")
             input_noecho = False
 
-        if params.interactive:
+        if args.interactive:
             if model.is_antiprompt_present():
                 # reverse prompt found
                 is_interacting = True
             if is_interacting:
+                if args.instruct:
+                    model.update_input_tokens(inp_pfx)
+                    print("\n> ", end="")
+
                 process_interactive_input(model)
+
+                if args.instruct:
+                    model.update_input_tokens(inp_sfx)
+
                 input_noecho = True
                 is_interacting = False
-
+        
+        # end of text token was found
         if is_finished:
-            break
+            if args.interactive:
+                is_interacting = True
+            else:
+                print(" [end of text]")
+                break
+        
+        if args.interactive and model.is_finished():
+            model.reset_remaining_tokens()
+            is_interacting = True
 
     return 0
 
 
 def run():
     # Parse params into a gpt_params object
-    params = parse_args_into_params(sys.argv)
-    return main(params)
+    args = parse_args_into_params(sys.argv)
+    return main(args)
 
 if __name__ == "__main__":
     sys.exit(run())
