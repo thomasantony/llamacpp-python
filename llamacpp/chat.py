@@ -92,34 +92,12 @@ def parse_chat_params(argv) -> llamacpp.gpt_params:
 
     args = parser.parse_args(argv[1:])
 
-    # Add a space in front of the first character to match OG llama tokenizer behavior
-    args.prompt = " " + args.prompt
-    
-    # Initialize gpt_params object
-    params = llamacpp.gpt_params(
-        args.model,
-        args.prompt,
-        args.reverse_prompt,
-        args.ctx_size,
-        args.n_predict,
-        args.top_k,
-        args.top_p,
-        args.temp,
-        args.repeat_penalty,
-        args.seed,
-        args.threads,
-        args.repeat_last_n,
-        args.batch_size,
-        args.color,
-        args.interactive
-    )
-
-    return params
+    return args
 
 
 def run():
-    params = parse_chat_params(sys.argv)
-    return llamacpp_main(params)
+    args = parse_chat_params(sys.argv)
+    return llamacpp_main(args)
 
 
 if __name__ == "__main__":
