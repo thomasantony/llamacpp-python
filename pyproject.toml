@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "llamacpp"
-version = "0.1.6"
+version = "0.1.7"
 description = "Python bindings for @ggerganov's llama.cpp"
 authors = ["Thomas Antony <mail@thomasantony.com>"]
 license = "MIT"
@@ -10,7 +10,7 @@ repository = "https://github.com/thomasantony/llamacpp-python"
 packages = [{ include = "llamacpp", from = "." }]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 
 [tool.poetry.group.dev.dependencies]
 # Require torch and sentencepiece for running the convert script
