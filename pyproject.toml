@@ -33,9 +33,11 @@ llamacpp-cli = 'llamacpp.cli:run'
 llamacpp-chat = 'llamacpp.chat:run'
 
 [tool.cibuildwheel]
+# Install pybind and poetry
+before-build = "pip install -U \"pybind11[global]\" poetry"
 
-# Install something required for the build
-# (you might want to use build-system.requires instead)
-before-build = "pip install -U \"pybind11[global]\""
 # Skip PyPy and 32-bit builds
 skip = ["pp*", "*-win32", "*-manylinux_i686", "*-musllinux_i686"]
+
+build-verbosity = 3
+test-skip = "*macosx*arm64*"
