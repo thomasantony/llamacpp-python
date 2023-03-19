@@ -5,9 +5,14 @@
 ### macOS
 
 ```
-brew install pybind11  # Installs dependency
-git submodule init && git submodule update
-poetry install
+1. git clone this repository
+2. cd into the repository
+2. brew install pybind11  # Installs dependency
+3. git submodule init && git submodule update
+4. (optional) pip3 install virtualenv && virtualenv venv/ && source venv/bin/activate
+5. poetry install && poetry build
+6. pip3 install dist/llamacpp-
+7. poetry run llamacpp-cli
 ```
 ### From PyPI
 
