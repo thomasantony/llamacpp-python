@@ -28,9 +28,6 @@ jobs:
         arch: [auto64]
         cibw_build: ["cp3{9,10,11}-*"]
         p_ver: ["3.9-3.11"]
-        exclude:
-          - arch: arm64
-            os: macos-latest
         include:
           - arch: aarch64
             os: ubuntu-latest
