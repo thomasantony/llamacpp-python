@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "llamacpp"
-version = "0.1.5"
+version = "0.1.6"
 description = "Python bindings for @ggerganov's llama.cpp"
 authors = ["Thomas Antony <mail@thomasantony.com>"]
 license = "MIT"
