@@ -2,7 +2,7 @@
 #include "llama.h"
 #include "utils.h"
 #include <pybind11/pybind11.h>
-
+#include <pybind11/stl.h>
 
 namespace py = pybind11;
 
@@ -147,6 +147,7 @@ PYBIND11_MODULE(llamacpp, m) {
 
     py::class_<PyLLAMA>(m, "PyLLAMA")
         .def(py::init<gpt_params>())
+        .def("tokenize", &PyLLAMA::tokenize, "Tokenize text")
         .def("prepare_context", &PyLLAMA::prepare_context, "Prepare the LLaMA context")
         .def("add_bos", &PyLLAMA::add_bos, "Add a BOS token to the input")
         .def("update_input", &PyLLAMA::update_input, "Update input as text")
