@@ -2,16 +2,7 @@
 #include "llama.h"
 #include "utils.h"
 #include <pybind11/pybind11.h>
-#include <csignal>
 
-
-
-void catch_signals() {
-  auto handler = [](int code) { throw std::runtime_error("SIGNAL " + std::to_string(code)); };
-  signal(SIGINT, handler);
-  signal(SIGTERM, handler);
-  signal(SIGKILL, handler);
-}
 
 namespace py = pybind11;
 
