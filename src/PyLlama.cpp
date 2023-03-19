@@ -46,6 +46,9 @@ public:
     void update_input(const std::string& text) {
         llama_update_input(*ctx_ptr, text);
     }
+    void update_input_tokens(const std::vector<gpt_vocab::id>& ids) {
+        llama_update_input(*ctx_ptr, ids);
+    }
     bool is_finished() {
         return llama_context_is_finished(*ctx_ptr);
     }
@@ -146,7 +149,8 @@ PYBIND11_MODULE(llamacpp, m) {
         .def(py::init<gpt_params>())
         .def("prepare_context", &PyLLAMA::prepare_context, "Prepare the LLaMA context")
         .def("add_bos", &PyLLAMA::add_bos, "Add a BOS token to the input")
-        .def("update_input", &PyLLAMA::update_input, "Update input")
+        .def("update_input", &PyLLAMA::update_input, "Update input as text")
+        .def("update_input_tokens", &PyLLAMA::update_input_tokens, "Update input tokens")
         .def("is_finished", &PyLLAMA::is_finished, "Check if the model is finished")
         .def("has_unconsumed_input", &PyLLAMA::has_unconsumed_input, "Check if the model has unconsumed input")
         // ingest_all_pending_input. Does not print to stdout by default
