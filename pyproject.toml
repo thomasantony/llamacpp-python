@@ -11,8 +11,12 @@ packages = [{ include = "llamacpp", from = "." }]
 
 [tool.poetry.dependencies]
 python = "^3.6"
+
+[tool.poetry.group.dev.dependencies]
+# Require torch and sentencepiece for running the convert script
 torch = "^1.13.1"
 sentencepiece = "^0.1.97"
+setuptools-cpp = "^0.1.0"
 
 [build-system]
 requires = ["poetry>=0.12", "setuptools", "wheel", "setuptools-cpp"]
