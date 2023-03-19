@@ -58,7 +58,7 @@ jobs:
 
       - name: Set up QEMU
         if: matrix.os == 'ubuntu-latest' && matrix.arch == 'aarch64'
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
         with:
           platforms: arm64
 
