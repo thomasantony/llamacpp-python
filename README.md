@@ -79,7 +79,4 @@ model.print_end_stats()
 
 ## ToDo
 
-- [x] Use poetry to build package
-- [x] Add command line entry point for quantize script
-- [x] Publish wheel to PyPI
-- [ ] Add chat interface based on tinygrad
+- [ ] Investigate using dynamic versions using setuptools-scm (Example: https://github.com/pypa/setuptools_scm/blob/main/scm_hack_build_backend.py)
