@@ -1,0 +1,29 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Current File",
+      "type": "python",
+      "request": "launch",
+      "program": "examples/simple.py",
+      "console": "integratedTerminal",
+      "args": [],
+      "justMyCode": true
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "LLDB Python",
+      "program": "/Users/thomas/miniconda3/envs/llamacpp/bin/python",
+      "args": ["${workspaceFolder}/examples/simple.py"],
+      "cwd": "${workspaceFolder}",
+      "stopOnEntry": false
+      // "env": {
+      //   "PYTHONPATH": "${workspaceFolder}/build"
+      // }
+    }
+  ]
+}
