@@ -36,6 +36,12 @@ llamacpp-cli
 
 The package installs the command line entry point `llamacpp-cli` that points to `llamacpp/cli.py` and should provide about the same functionality as the `main` program in the original C++ repository. There is also an experimental `llamacpp-chat` that is supposed to bring up a chat interface but this is not working correctly yet.
 
+## API
+
+Documentation is TBD. But the long and short of it is that there are two interfaces
+* `LlamaInference` - this one is a high level interface that tries to take care of most things for you. The demo script below uses this.
+* `LlamaContext` - this is a low level interface to the underlying llama.cpp API. You can use this similar to how the [main](https://github.com/ggerganov/llama.cpp/blob/master/examples/main/main.cpp) example in `llama.cpp` does uses the C API. This is a rough implementation and currently untested except for compiling successfully.
+
 ## Demo script
 
 See `llamacpp/cli.py` for a detailed example. The simplest demo would be something like the following:
@@ -44,37 +50,33 @@ See `llamacpp/cli.py` for a detailed example. The simplest demo would be somethi
 import sys
 import llamacpp
 
-params = llamacpp.gpt_params(
-    './models/7B/ggml-model-q4_0.bin',  # model,
-    512,  # ctx_size
-    100,  # n_predict
-    40,  # top_k
-    0.95,  # top_p
-    0.85,  # temp
-    1.30,  # repeat_penalty
-    -1,  # seed
-    8,  # threads
-    64,  # repeat_last_n
-    8,  # batch_size
-)
-model = llamacpp.PyLLAMA(params)
-model.add_bos()     # Adds "beginning of string" token
-model.update_input("A llama is a")
-model.print_startup_stats()
-model.prepare_context()
 
-model.ingest_all_pending_input(True)
-while not model.is_finished():
-    text, is_finished = model.infer_text()
+def progress_callback(progress):
+    print("Progress: {:.2f}%".format(progress * 100))
+    sys.stdout.flush()
+
+
+params = llamacpp.InferenceParams.default_with_callback(progress_callback)
+params.path_model = './models/7B/ggml-model-q4_0.bin'
+model = llamacpp.LlamaInference(params)
+
+prompt = "A llama is a"
+prompt_tokens = model.tokenize(prompt, True)
+model.update_input(prompt_tokens)
+
+model.ingest_all_pending_input()
+
+model.print_system_info()
+for i in range(20):
+    model.eval()
+    token = model.sample()
+    text = model.token_to_str(token)
     print(text, end="")
-
-    if is_finished:
-        break
-
+    
 # Flush stdout
 sys.stdout.flush()
 
-model.print_end_stats()
+model.print_timings()
 ```
 
 ## ToDo
