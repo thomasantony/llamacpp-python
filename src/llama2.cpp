@@ -233,7 +233,11 @@ public:
     {
         return llama.sample();
     }
-
+    // Add BOS token to the input
+    void add_bos()
+    {
+        llama.add_bos();
+    }
     // update input using tokens
     void update_input(const std::vector<llama_token>& tokens)
     {
@@ -341,6 +345,7 @@ PYBIND11_MODULE(llamacpp, m) {
         .def("update_input", py::overload_cast<const std::string&>(&LlamaInference::update_input), "Update the input with the provided text")
         .def("eval", &LlamaInference::eval, "Run the llama inference to obtain the logits and probabilities for the next token",
                 py::call_guard<py::gil_scoped_release>())
+        .def("add_bos", &LlamaInference::add_bos)
         .def("tokenize", &LlamaInference::tokenize, "Convert the provided text into tokens",
                 py::arg("text"), py::arg("add_bos"))
         .def("has_unconsumed_input", &LlamaInference::has_unconsumed_input, "Check if there is unconsumed input")
@@ -354,7 +359,8 @@ PYBIND11_MODULE(llamacpp, m) {
         .def("print_timings", &LlamaInference::print_timings, "Print the timings for the last call to eval()")
         .def("reset_timings", &LlamaInference::reset_timings, "Reset the timings for the last call to eval()")
         .def_static("system_info", &llama_print_system_info, "Print system information")
-        .def("sample", &LlamaInference::sample, "Sample a token from the logits");
+        .def("sample", &LlamaInference::sample, "Sample a token from the logits")
+        .def("get_tokenizer", &LlamaInference::get_tokenizer, "Get the tokenizer");
         
 
     // /* Wrapper for Tokenizer */

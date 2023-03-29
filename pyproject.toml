@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "llamacpp"
-version = "0.1.9"
+version = "0.1.10"
 description = "Python bindings for @ggerganov's llama.cpp"
 authors = [
     {name = "Thomas Antony", email= "mail@thomasantony.com"}

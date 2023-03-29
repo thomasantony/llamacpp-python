@@ -13,10 +13,10 @@ model = llamacpp.LlamaInference(params)
 
 prompt = "A llama is a"
 prompt_tokens = model.tokenize(prompt, True)
+model.add_bos()
 model.update_input(prompt_tokens)
 
 model.ingest_all_pending_input()
-
 print(model.system_info())
 for i in range(20):
     model.eval()
