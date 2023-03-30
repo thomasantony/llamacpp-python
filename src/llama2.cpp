@@ -26,12 +26,10 @@ class LlamaContext
 {
     llama_context* ctx;
 public:
-    static LlamaContext load(std::string path_model, const llama_context_params& params)
-    {
-        llama_context* ctx = llama_init_from_file(path_model.c_str(), params);
-        return LlamaContext(ctx);
+    LlamaContext(std::string path_model, const llama_context_params& params) {
+        ctx = llama_init_from_file(path_model.c_str(), params);
     }
-    static LlamaContext load_with_callback(std::string path_model, const llama_context_params& params, Callback progress_cb)
+    LlamaContext(std::string path_model, const llama_context_params& params, Callback progress_cb)
     {
         llama_context_params params_with_cb = params;
         params_with_cb.progress_callback = [](float progress, void* user_data) {
@@ -40,10 +38,8 @@ public:
         };
         params_with_cb.progress_callback_user_data = &progress_cb;
 
-        llama_context* ctx = llama_init_from_file(path_model.c_str(), params_with_cb);
-        return LlamaContext(ctx);
+        ctx = llama_init_from_file(path_model.c_str(), params_with_cb);
     }
-    LlamaContext(llama_context* ctx): ctx(ctx) {}
     ~LlamaContext()
     {
         llama_free(ctx);
@@ -323,9 +319,8 @@ PYBIND11_MODULE(llamacpp, m) {
 
     /* Wrapper for LlamaContext */
     py::class_<LlamaContext>(m, "LlamaContext")
-        .def(py::init(&LlamaContext::load), py::arg("params"), py::arg("path_model"))
-        .def(py::init(&LlamaContext::load_with_callback), 
-            py::arg("params"), py::arg("path_model"), py::arg("progress_callback"))
+        .def(py::init<std::string, const llama_context_params&>(), py::arg("path_model"), py::arg("params")) 
+        .def(py::init<std::string, const llama_context_params&, Callback>(), py::arg("path_model"), py::arg("params"), py::arg("progress_callback"))
         .def("get_n_vocab", &LlamaContext::get_n_vocab, "Get the number of tokens in the vocabulary")
         .def("get_n_embd", &LlamaContext::get_n_embd, "Get the number of dimensions in the embedding")
         .def("get_n_ctx", &LlamaContext::get_n_ctx, "Get the number of tokens in the context")
