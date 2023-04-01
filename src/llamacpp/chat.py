@@ -90,6 +90,7 @@ def parse_chat_params(argv) -> Dict[str, str]:
     )
     parser.add_argument("-m", "--model", type=str, default="./models/7B/ggml-model-q4_0.bin", help="model path (default: )")
     parser.add_argument("--mlock", action="store_true", help="use mlock to lock memory")
+    parser.add_argument("--memory_f16", action="store_true", help="use half-precision memory")
 
     args = parser.parse_args(argv[1:])
 
