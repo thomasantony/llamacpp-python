@@ -2,6 +2,7 @@
 import sys
 import llamacpp
 import argparse
+from typing import Dict
 
 from llamacpp.cli import main as llamacpp_main
 
@@ -13,7 +14,7 @@ Bob: Hello. How may I help you today?
 User:"""
 
 
-def parse_chat_params(argv) -> llamacpp.gpt_params:
+def parse_chat_params(argv) -> Dict[str, str]:
     """Parse chat parameters"""
 
     parser = argparse.ArgumentParser(description="LLaMa")
