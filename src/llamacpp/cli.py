@@ -106,11 +106,6 @@ def process_interactive_input(model: llamacpp.LlamaInference):
 def main(args):
     """Main function"""
 
-    # if args.file is specified, read the file and set the prompt to the contents
-    if args.file:
-        with open(args.file, "r") as f:
-            args.prompt = f.read().strip()
-
     # Add a space in front of the first character to match OG llama tokenizer behavior
     args.prompt = " " + args.prompt
     
@@ -209,6 +204,12 @@ def main(args):
 def run():
     # Parse params into a gpt_params object
     args = parse_args_into_params(sys.argv)
+
+    # if args.file is specified, read the file and set the prompt to the contents
+    if args.file:
+        with open(args.file, "r") as f:
+            args.prompt = f.read().strip()
+
     return main(args)
 
 
