@@ -7,6 +7,10 @@ def llama_model():
     params = llamacpp.InferenceParams()
     params.path_model = '../models/7B/ggml-model-f16.bin'
     params.seed = 19472
+    params.top_k = 40
+    params.top_p = 0.95
+    params.repeat_last_n = 64
+    params.n_predict = 8
     return llamacpp.LlamaInference(params)
 
 
@@ -36,9 +40,9 @@ def test_eval(llama_model):
     llama_model.update_input(prompt_tokens)
     llama_model.ingest_all_pending_input()
     output = prompt
-    for i in range(9):
+    for i in range(8):
         llama_model.eval()
         token = llama_model.sample()
         output += llama_model.token_to_str(token)
 
-    assert output == "Llama is the newest member of our farm family."
+    assert output == " Llama is the newest member of our farm family"
