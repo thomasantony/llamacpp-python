@@ -63,7 +63,7 @@ def parse_args_into_params(argv) -> Dict[str, str]:
     )
     parser.add_argument(
         "-c",
-        "--n_ctx",
+        "--ctx_size",
         type=int,
         default=512,
         help="size of the prompt context (default: 512)",
@@ -121,7 +121,7 @@ def main(args):
     params.repeat_penalty = args.repeat_penalty
     params.use_mlock = args.mlock
     params.memory_f16 = args.memory_f16
-    params.n_ctx = args.n_ctx
+    params.n_ctx = args.ctx_size
 
     model = llamacpp.LlamaInference(params)
     model.update_input([model.token_bos()])
