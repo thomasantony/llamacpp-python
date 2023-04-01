@@ -82,8 +82,6 @@ def parse_args_into_params(argv) -> Dict[str, str]:
     parser.add_argument("--n_batch", type=int, default=8, help="number of tokens per batch")
     parser.add_argument("--n_threads", type=int, default=4, help="number of threads to use")
 
-    parser.usage = parser.format_help()
-
     args = parser.parse_args(argv[1:])
 
     if args.interactive or args.instruct:
