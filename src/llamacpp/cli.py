@@ -33,7 +33,7 @@ def parse_args_into_params(argv) -> Dict[str, str]:
         "--threads",
         type=int,
         default=4,
-        help="number of threads to use during computation (default: 1)",
+        help="number of threads to use during computation (default: 4)",
     )
     parser.add_argument(
         "-p",
@@ -80,7 +80,6 @@ def parse_args_into_params(argv) -> Dict[str, str]:
     parser.add_argument("--use_mlock", action="store_true", help="use mlock to lock memory")
     parser.add_argument("--memory_f16", action="store_true", help="use half-precision memory")
     parser.add_argument("--n_batch", type=int, default=8, help="number of tokens per batch")
-    parser.add_argument("--n_threads", type=int, default=4, help="number of threads to use")
 
     args = parser.parse_args(argv[1:])
 
@@ -118,7 +117,7 @@ def main(args):
     params = llamacpp.InferenceParams()
     params.path_model = args.model
     params.seed = args.seed
-    params.n_threads = args.n_threads
+    params.n_threads = args.threads
 
     params.repeat_last_n = args.repeat_last_n
     params.n_batch = args.n_batch
