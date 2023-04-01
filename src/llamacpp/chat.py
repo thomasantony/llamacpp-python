@@ -89,6 +89,7 @@ def parse_chat_params(argv) -> Dict[str, str]:
         help="batch size for prompt processing (default: 2)",
     )
     parser.add_argument("-m", "--model", type=str, default="./models/7B/ggml-model-q4_0.bin", help="model path (default: )")
+    parser.add_argument("--mlock", action="store_true", help="use mlock to lock memory")
 
     args = parser.parse_args(argv[1:])
 
