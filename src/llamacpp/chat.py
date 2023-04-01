@@ -99,6 +99,9 @@ def parse_chat_params(argv) -> Dict[str, str]:
 
 def run():
     args = parse_chat_params(sys.argv)
+
+    args.instruct = False
+
     return llamacpp_main(args)
 
 
