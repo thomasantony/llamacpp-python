@@ -74,12 +74,11 @@ def parse_args_into_params(argv) -> Dict[str, str]:
         "--batch_size",
         type=int,
         default=8,
-        help="batch size for prompt processing (default: 2)",
+        help="batch size for prompt processing (default: 8)",
     )
     parser.add_argument("-m", "--model", type=str, default="./models/7B/ggml-model-q4_0.bin", help="model path (default: )")
     parser.add_argument("--use_mlock", action="store_true", help="use mlock to lock memory")
     parser.add_argument("--memory_f16", action="store_true", help="use half-precision memory")
-    parser.add_argument("--n_batch", type=int, default=8, help="number of tokens per batch")
 
     args = parser.parse_args(argv[1:])
 
@@ -115,7 +114,7 @@ def main(args):
     params.n_threads = args.threads
 
     params.repeat_last_n = args.repeat_last_n
-    params.n_batch = args.n_batch
+    params.n_batch = args.batch_size
     params.top_k = args.top_k
     params.top_p = args.top_p
     params.temp = args.temp
