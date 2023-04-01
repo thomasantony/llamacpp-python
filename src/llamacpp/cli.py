@@ -77,7 +77,7 @@ def parse_args_into_params(argv) -> Dict[str, str]:
         help="batch size for prompt processing (default: 8)",
     )
     parser.add_argument("-m", "--model", type=str, default="./models/7B/ggml-model-q4_0.bin", help="model path (default: )")
-    parser.add_argument("--use_mlock", action="store_true", help="use mlock to lock memory")
+    parser.add_argument("--mlock", action="store_true", help="use mlock to lock memory")
     parser.add_argument("--memory_f16", action="store_true", help="use half-precision memory")
 
     args = parser.parse_args(argv[1:])
@@ -119,7 +119,7 @@ def main(args):
     params.top_p = args.top_p
     params.temp = args.temp
     params.repeat_penalty = args.repeat_penalty
-    params.use_mlock = args.use_mlock
+    params.use_mlock = args.mlock
     params.memory_f16 = args.memory_f16
     params.n_ctx = args.n_ctx
 
