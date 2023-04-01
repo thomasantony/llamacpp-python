@@ -88,7 +88,6 @@ def parse_chat_params(argv) -> llamacpp.gpt_params:
         help="batch size for prompt processing (default: 2)",
     )
     parser.add_argument("-m", "--model", type=str, default="./models/7B/ggml-model-q4_0.bin", help="model path (default: )")
-    parser.usage = parser.format_help()
 
     args = parser.parse_args(argv[1:])
 
