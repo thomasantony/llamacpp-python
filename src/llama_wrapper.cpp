@@ -25,6 +25,13 @@ bool LlamaWrapper::init()
     }else{
         inference_params.ctx_params.progress_callback = nullptr;
     }
+
+	// update default ctx params with our user-selected overrides
+	inference_params.ctx_params.n_ctx = inference_params.n_ctx;
+	inference_params.ctx_params.seed = inference_params.seed;
+	inference_params.ctx_params.use_mlock = inference_params.use_mlock;
+	inference_params.ctx_params.f16_kv = inference_params.memory_f16;
+
     ctx = llama_init_from_file(inference_params.path_model.c_str(), inference_params.ctx_params);
 
     n_ctx = llama_n_ctx(ctx);
