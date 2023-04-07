@@ -2,6 +2,7 @@ import array
 import llamacpp
 
 params = llamacpp.LlamaContextParams()
+params.seed = 19472
 model = llamacpp.LlamaContext("./models/7B/ggml-model-f16.bin", params)
 
 prompt = "Llama is"
@@ -33,10 +34,10 @@ while n_remain:
         top_k = 40
         top_p = 0.95
         temp = 0.8
-        repeat_last_n = 64
+        repeat_penalty = 0.0
 
         # sending an empty array for the last n tokens
-        id = model.sample_top_p_top_k(array.array('i', []), top_k, top_p, temp, repeat_last_n)
+        id = model.sample_top_p_top_k(array.array('i', []), top_k, top_p, temp, repeat_penalty)
         # add it to the context
         embd.append(id)
         # decrement remaining sampling budget
