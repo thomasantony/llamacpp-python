@@ -234,7 +234,18 @@ public:
     {
         llama.add_bos();
     }
-    // update input using tokens
+    // set input using tokens
+    void set_input(const std::vector<llama_token>& tokens)
+    {
+        llama.set_input(tokens);
+    }
+    // set input using string
+    void set_input(const std::string& text)
+    {
+        llama.set_input(text);
+    }
+
+    // set input using tokens
     void update_input(const std::vector<llama_token>& tokens)
     {
         llama.update_input(tokens);
@@ -336,6 +347,8 @@ PYBIND11_MODULE(llamacpp, m) {
     /* Wrapper for LlamaInference methods */
     py::class_<LlamaInference>(m, "LlamaInference")
         .def(py::init<InferenceParams>(), py::arg("params"))
+        .def("set_input", py::overload_cast<const std::vector<llama_token>&>(&LlamaInference::set_input), "Set the input to the provided tokens")
+        .def("set_input", py::overload_cast<const std::string&>(&LlamaInference::set_input), "Set the input to the provided tokens")
         .def("update_input", py::overload_cast<const std::vector<llama_token>&>(&LlamaInference::update_input), "Update the input with the provided tokens")
         .def("update_input", py::overload_cast<const std::string&>(&LlamaInference::update_input), "Update the input with the provided text")
         .def("eval", &LlamaInference::eval, "Run the llama inference to obtain the logits and probabilities for the next token",
