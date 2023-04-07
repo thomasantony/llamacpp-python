@@ -61,6 +61,7 @@ void LlamaWrapper::clear_input()
 {
     embd_inp.clear();
     n_consumed = 0;
+    std::fill(last_n_tokens.begin(), last_n_tokens.end(), 0);
 }
 
 // Set the model input buffer
@@ -72,8 +73,11 @@ void LlamaWrapper::set_input(const std::string& text)
 // Set the model input buffer from tokens
 void LlamaWrapper::set_input(const vector<llama_token>& tokens)
 {
-    embd_inp = tokens;
+    embd_inp.clear();
+    update_input(tokens);
+    std::fill(last_n_tokens.begin(), last_n_tokens.end(), 0);
     n_consumed = 0;
+    n_past = 0;
 }
 
 // Update input with text
