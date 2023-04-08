@@ -326,7 +326,8 @@ PYBIND11_MODULE(llamacpp, m) {
         .def_readwrite("use_mlock", &InferenceParams::use_mlock)
         .def_readwrite("memory_f16", &InferenceParams::memory_f16)
         .def_readwrite("n_ctx", &InferenceParams::n_ctx)
-        .def_readwrite("callback", &InferenceParams::callback);
+        .def_readwrite("callback", &InferenceParams::callback)
+        .def_readwrite("n_keep", &InferenceParams::n_keep);
 
     /* Wrapper for LlamaContext */
     py::class_<LlamaContext>(m, "LlamaContext")
