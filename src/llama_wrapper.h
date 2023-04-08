@@ -19,6 +19,7 @@ struct InferenceParams {
     int32_t n_predict     = 128;  // new tokens to predict
     int32_t repeat_last_n = 64;   // last n tokens to penalize
     int32_t n_batch       = 8;    // batch size for prompt processing
+    int32_t n_keep        = 0;    // number of tokens to keep from initial prompt
 
     // sampling parameters
     int32_t top_k = 40;
