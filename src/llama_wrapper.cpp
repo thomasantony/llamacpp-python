@@ -129,6 +129,18 @@ bool LlamaWrapper::has_unconsumed_input() const
 bool LlamaWrapper::eval()
 {
     if (embd.size() > 0) {
+        // infinite text generation via context swapping
+        // if we run out of context:
+        // - take the n_keep first tokens from the original prompt (via n_past)
+        // - take half of the last (n_ctx - n_keep) tokens and recompute the logits in a batch
+        if (n_past + (int) embd.size() > n_ctx) {
+            const int n_left = n_past - inference_params.n_keep;
+
+            n_past = inference_params.n_keep;
+
+            // insert n_left/2 tokens at the start of embd from last_n_tokens
+            embd.insert(embd.begin(), last_n_tokens.begin() + n_ctx - n_left/2 - embd.size(), last_n_tokens.end() - embd.size());
+        }
         if (llama_eval(ctx, embd.data(), embd.size(), n_past, inference_params.n_threads) != 0) {
             fprintf(stderr, "Failed to predict\n");
             return false;
