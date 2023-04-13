@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "llamacpp"
-version = "0.1.14"
+version = "0.1.15"
 description = "Python bindings for @ggerganov's llama.cpp"
 authors = [
     {name = "Thomas Antony", email= "mail@thomasantony.com"}
@@ -30,6 +30,7 @@ repository = "https://github.com/thomasantony/llamacpp-python"
 
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
+cmake.build-type = "Release"
 
 [project.scripts]
 llamacpp-convert = 'llamacpp.convert:main'
