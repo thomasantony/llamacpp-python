@@ -102,14 +102,11 @@ public:
 
     // Get the embeddings for the input
     // shape: [n_embd] (1-dimensional)
-    py::memoryview get_embeddings() const
+    py::array_t<float> get_embeddings() const
     {
         const float* embd_ptr = llama_get_embeddings(ctx);
         const size_t n_embd = llama_n_embd(ctx);
-        return py::memoryview::from_memory(
-            embd_ptr,                // buffer pointer
-            sizeof(float) * n_embd   // strides in bytes
-        );
+        return py::array(n_embd, embd_ptr);
     }
 
     // Token logits obtained from the last call to eval()
@@ -223,14 +220,11 @@ public:
 
     // Get the embeddings for the input
     // shape: [n_embd] (1-dimensional)
-    py::memoryview get_embeddings() const
+    py::array_t<float> get_embeddings() const
     {
         const float* embd_ptr = llama.get_embeddings();
         const size_t n_embd = llama.get_n_embd();
-        return py::memoryview::from_memory(
-            embd_ptr,                // buffer pointer
-            sizeof(float) * n_embd   // strides in bytes
-        );
+        return py::array(n_embd, embd_ptr);
     }
 
     // Token Id -> String. Uses the vocabulary in the provided context
