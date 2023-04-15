@@ -112,6 +112,21 @@ public:
         );
     }
 
+    // Token logits obtained from the last call to eval()
+    // The logits for the last token are stored in the last row
+    // Can be mutated in order to change the probabilities of the next token
+    // Rows: n_tokens
+    // Cols: n_vocab
+    py::memoryview get_logits() const
+    {
+        const float* logit_ptr = llama_get_logits(ctx);
+        const size_t n_vocab = llama_n_vocab(ctx);
+        return py::memoryview::from_memory(
+            logit_ptr,                // buffer pointer
+            sizeof(float) * n_vocab   // strides in bytes
+        );
+    }
+
     // Get the number of tokens in the vocabulary
     size_t get_n_vocab() const
     {
@@ -337,6 +352,7 @@ PYBIND11_MODULE(llamacpp, m) {
         .def("get_n_embd", &LlamaContext::get_n_embd, "Get the number of dimensions in the embedding")
         .def("get_n_ctx", &LlamaContext::get_n_ctx, "Get the number of tokens in the context")
         .def("get_embeddings", &LlamaContext::get_embeddings, "Get the embeddings as a numpy array")
+        .def("get_logits", &LlamaContext::get_logits, "Get the logits as a numpy array")
         .def("token_to_str", &LlamaContext::token_to_str, "Convert a token id to a string")
         .def("str_to_token", &LlamaContext::str_to_token, "Convert a string to a token id")
         .def("print_timings", &LlamaContext::print_timings, "Print the timings for the last call to eval()")
