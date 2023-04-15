@@ -25,8 +25,13 @@ public:
 class LlamaContext
 {
     llama_context* ctx;
+    // Flag that indicates whether the logits for all tokens should be returned
+    // as opposed to just the last one (helpful for building kNN datastores or 
+    // computing perplexity)
+    bool logits_all = false;
+    int last_eval_n_tokens = 0;
 public:
-    LlamaContext(std::string path_model, const llama_context_params& params) {
+    LlamaContext(std::string path_model, const llama_context_params& params): logits_all(params.logits_all) {
         ctx = llama_init_from_file(path_model.c_str(), params);
     }
     LlamaContext(std::string path_model, const llama_context_params& params, Callback progress_cb)
@@ -64,6 +69,7 @@ public:
             throw std::runtime_error("Invalid number of tokens");
         }
         llama_token* tokens_ptr = (llama_token*)tokens.request().ptr;
+        last_eval_n_tokens = n_tokens;
         return llama_eval(ctx, tokens_ptr, n_tokens, n_past, n_threads);
     }
 
@@ -87,17 +93,44 @@ public:
 
     // Token logits obtained from the last call to eval()
     // The logits for the last token are stored in the last row
-    // Can be mutated in order to change the probabilities of the next token
-    // TODO: Fix this so that it returns a 2D array
-    // Length: n_vocab
-    py::memoryview get_logits() const
+    // Size: n_tokens x n_vocab (n_tokens == 1 if params.logits_all == 0)
+    py::memoryview get_logits()
     {
-        const float* logit_ptr = llama_get_logits(ctx);
-        const size_t n_vocab = llama_n_vocab(ctx);
-        return py::memoryview::from_memory(
-            logit_ptr,                // buffer pointer
-            sizeof(float) * n_vocab   // strides in bytes
-        );
+        if(last_eval_n_tokens == 0)
+        {
+            throw std::runtime_error("No logits available. Call eval() first.");
+        }
+        // Returns matrix if logits_all is true
+        // and vector otherwise
+        if (logits_all)
+        {
+            float* logits_ptr = llama_get_logits(ctx);
+            const size_t n_vocab = llama_n_vocab(ctx);
+            const size_t n_tokens = last_eval_n_tokens;
+
+            return py::memoryview::from_buffer(
+                static_cast<void*>(logits_ptr),   /* Pointer to buffer */
+                sizeof(float),                    /* Size of one scalar */
+                "f",                              /* Python struct-style format descriptor */
+                { n_tokens, n_vocab },            /* Buffer dimensions */
+                { sizeof(float) * n_vocab,        /* Assumes Row-Major */
+                  sizeof(float) * 1 },            /* Strides (in bytes) for each index */
+                true                              /* Read only */
+            );
+        }else{
+            float* logits_ptr = llama_get_logits(ctx);
+            const size_t n_vocab = llama_n_vocab(ctx);
+            const size_t n_tokens = 1;
+            return py::memoryview::from_buffer(
+                static_cast<void*>(logits_ptr),   /* Pointer to buffer */
+                sizeof(float),                    /* Size of one scalar */
+                "f",                              /* Python struct-style format descriptor */
+                { n_tokens, n_vocab },            /* Buffer dimensions */
+                { sizeof(float) * n_vocab,        /* Assumes Row-Major */
+                  sizeof(float) * 1 },            /* Strides (in bytes) for each index */
+                true                              /* Read only */
+            );
+        }   
     }
 
     // Get the embeddings for the input
@@ -107,21 +140,6 @@ public:
         const float* embd_ptr = llama_get_embeddings(ctx);
         const size_t n_embd = llama_n_embd(ctx);
         return py::array(n_embd, embd_ptr);
-    }
-
-    // Token logits obtained from the last call to eval()
-    // The logits for the last token are stored in the last row
-    // Can be mutated in order to change the probabilities of the next token
-    // Rows: n_tokens
-    // Cols: n_vocab
-    py::memoryview get_logits() const
-    {
-        const float* logit_ptr = llama_get_logits(ctx);
-        const size_t n_vocab = llama_n_vocab(ctx);
-        return py::memoryview::from_memory(
-            logit_ptr,                // buffer pointer
-            sizeof(float) * n_vocab   // strides in bytes
-        );
     }
 
     // Get the number of tokens in the vocabulary
@@ -205,17 +223,12 @@ public:
 
     // Token logits obtained from the last call to eval()
     // The logits for the last token are stored in the last row
-    // Can be mutated in order to change the probabilities of the next token
-    // Rows: n_tokens
-    // Cols: n_vocab
-    py::memoryview get_logits() const
+    // Size: n_vocab
+    py::array_t<float> get_logits() const
     {
         const float* logit_ptr = llama.get_logits();
         const size_t n_vocab = llama.get_n_vocab();
-        return py::memoryview::from_memory(
-            logit_ptr,                // buffer pointer
-            sizeof(float) * n_vocab   // strides in bytes
-        );
+        return py::array(n_vocab, logit_ptr);
     }
 
     // Get the embeddings for the input
