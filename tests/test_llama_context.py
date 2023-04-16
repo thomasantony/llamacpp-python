@@ -9,6 +9,7 @@ import pytest
 def llama_context():
     params = llamacpp.LlamaContextParams()
     params.seed = 19472
+    params.logits_all = True
     # Get path to current file
     current_file_path = os.path.dirname(os.path.realpath(__file__))
     # Get path to the model
@@ -64,5 +65,14 @@ def test_eval(llama_context):
     assert output == " Llama is the newest member of our growing family"
 
 
-if __name__=='__main__':
+def test_get_logits_all(llama_context):
+    """Verify that get_logits() returns a numpy array of the correct shape when
+    logits_all is set to True."""
+    embd_inp = llama_context.str_to_token(" Llama is", True)
+    llama_context.eval(array.array('i', embd_inp), len(embd_inp), 0, 1)
+    logits = llama_context.get_logits()
+    assert logits.shape == (len(embd_inp), 32000)
+
+
+if __name__ == '__main__':
     sys.exit(pytest.main(['-s', '-v', __file__]))
