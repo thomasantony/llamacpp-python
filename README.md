@@ -1,5 +1,10 @@
 ## Python bindings for llama.cpp
 
+**Important**
+
+- The Python API has changed significantly in the recent weeks and as a result, I have not had a chance to update `cli.py` or `chat.py` to reflect the new changes. The scripts under `examples/simple.py` and `examples/simple_low_level.py` should give you an idea of how to use the library. 
+
+
 ## Install
 ### From PyPI
 
